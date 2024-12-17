@@ -19,6 +19,11 @@ document.body.appendChild(renderer.domElement);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 
+//Textures
+
+const textureLoader = new THREE.TextureLoader()
+const glassTexture = textureLoader.load('glass.avif')
+
 // Scoreboard setup
 const scoreboard = document.getElementById('scoreboard');
 let score = 0;
@@ -26,17 +31,18 @@ let score = 0;
 // Box Class for creating 3D cubes (cube, ground, enemies)
 class Box extends THREE.Mesh {
   constructor({
+    
     width,
     height,
     depth,
-    color = '#00ff00', // Default green
+    color = '#ffffff', // Default green
     velocity = { x: 0, y: 0, z: 0 },
     position = { x: 0, y: 0, z: 0 },
     zAcceleration = false,
   }) {
     super(
       new THREE.BoxGeometry(width, height, depth),
-      new THREE.MeshStandardMaterial({ color })
+      new THREE.MeshStandardMaterial({map : glassTexture, color })
     );
 
     // Assign geometry properties
@@ -103,6 +109,7 @@ function boxCollision({ box1, box2 }) {
 
 // Create ground box
 const ground = new Box({
+  map: glassTexture,
   width: 10,
   height: 0.05,
   depth: 100,
@@ -220,17 +227,23 @@ function startGame() {
 
   animate();
 }
+const gameOverSound = new Howl({
+  src: ['Meow.mp3']
+});
 
 // Add logic to handle game over
 let gameOver = false;
 let restartButton = document.getElementById('restartButton');
 restartButton.addEventListener('click', () => {
+  gameOverSound.stop();
   startGame();  // Start a new game when the restart button is clicked
 });
 
 // Animation loop
 function animate() {
-  if (gameOver) return;
+  if (gameOver){
+    return;
+  }
 
   const animationId = requestAnimationFrame(animate);
   renderer.render(scene, camera);
@@ -249,6 +262,7 @@ function animate() {
   if (cube.position.y < -10) {
     console.log('Game Over');
     gameOver = true;
+    gameOverSound.play(); //Play game-over music
     document.getElementById('gameOverMessage').style.display = 'block'; // Show restart button
     cancelAnimationFrame(animationId); // Stop the animation
     return; // Stop further execution
@@ -260,6 +274,7 @@ function animate() {
     if (boxCollision({ box1: cube, box2: enemy })) {
       console.log('Game Over: Collision with enemy');
       gameOver = true;
+      gameOverSound.play(); //Play game-over music
       document.getElementById('gameOverMessage').style.display = 'block'; // Show restart button
       cancelAnimationFrame(animationId); // Stop the animation
       return; // Stop further execution
