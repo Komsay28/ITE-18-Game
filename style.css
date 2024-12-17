@@ -1,0 +1,37 @@
+html, body {
+  margin: 0;
+  background: black;
+  height: 100%;
+  overflow: hidden;
+}
+
+#scoreboard {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 24px;
+  color: white;
+  z-index: 100;
+}
+
+#gameOverMessage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+  text-align: center;
+}
+
+#gameOverMessage button {
+  background-color: #0369a1;
+  color: black;
+  font-size: 18px;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+}
+
+#gameOverMessage button:hover {
+  background-color: #0284c7;
+}
