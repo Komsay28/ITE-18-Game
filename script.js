@@ -193,6 +193,11 @@ function startGame() {
   gameOver = false;
   frames = 0;
   spawnRate = 200;
+
+  //Play soundtrack
+  gamePlaySound.play();
+
+  //reset the score
   score = 0;
   scoreboard.textContent = `Score: ${score}`;
   enemies.forEach((enemy) => {
@@ -207,6 +212,9 @@ function startGame() {
 
 const gameOverSound = new Howl({
   src: ['Meow.mp3']
+});
+const gamePlaySound = new Howl({
+  src: ['8bitVersion.mp3']
 });
 
 // Game over logic
@@ -233,10 +241,11 @@ function animate() {
   if (cube.position.y < -10) {
     console.log('Game Over');
     gameOver = true;
-    gameOverSound.play();
-    document.getElementById('gameOverMessage').style.display = 'block';
-    cancelAnimationFrame(animationId);
-    return;
+    gamePlaySound.stop(); //Stop Gameplay music
+    gameOverSound.play(); //Play game-over music
+    document.getElementById('gameOverMessage').style.display = 'block'; // Show restart button
+    cancelAnimationFrame(animationId); // Stop the animation
+    return; // Stop further execution
   }
 
   enemies.forEach((enemy) => {
@@ -244,10 +253,11 @@ function animate() {
     if (boxCollision({ box1: cube, box2: enemy })) {
       console.log('Game Over: Collision with enemy');
       gameOver = true;
-      gameOverSound.play();
-      document.getElementById('gameOverMessage').style.display = 'block';
-      cancelAnimationFrame(animationId);
-      return;
+      gamePlaySound.stop(); //Stop Gameplay music
+      gameOverSound.play(); //Play game-over music
+      document.getElementById('gameOverMessage').style.display = 'block'; // Show restart button
+      cancelAnimationFrame(animationId); // Stop the animation
+      return; // Stop further execution
     }
   });
 
