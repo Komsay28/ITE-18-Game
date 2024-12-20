@@ -1,7 +1,8 @@
+// === IMPORTS ===
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-// Create scene, camera, renderer, and controls
+// === SCENE, CAMERA, RENDERER, AND CONTROLS SETUP ===
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
@@ -15,15 +16,16 @@ document.body.appendChild(renderer.domElement);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 
-// Textures
+// === TEXTURE LOADER ===
 const textureLoader = new THREE.TextureLoader();
 const glassTexture = textureLoader.load('glass.avif');
 
-// Scoreboard setup
+// === SCOREBOARD SETUP ===
 const scoreboard = document.getElementById('scoreboard');
 let score = 0;
 
-// Box Class for creating 3D cubes and enemies
+// === BOX CLASS ===
+// Used for creating cubes, enemies, and the ground
 class Box extends THREE.Mesh {
   constructor({
     width,
@@ -90,7 +92,7 @@ class Box extends THREE.Mesh {
   }
 }
 
-// Check collision between two boxes
+// === COLLISION CHECK FUNCTION ===
 function boxCollision({ box1, box2 }) {
   const xCollision = box1.right >= box2.left && box1.left <= box2.right;
   const yCollision =
@@ -100,7 +102,7 @@ function boxCollision({ box1, box2 }) {
   return xCollision && yCollision && zCollision;
 }
 
-// Create ground box
+// === GROUND CREATION ===
 const ground = new Box({
   width: 10,
   height: 0.05,
@@ -115,7 +117,7 @@ const ground = new Box({
 ground.receiveShadow = true;
 scene.add(ground);
 
-// Create the cube (player's object)
+// === PLAYER CUBE CREATION ===
 const cube = new Box({
   width: 1,
   height: 1,
@@ -130,20 +132,21 @@ cube.position.set(0, ground.position.y + ground.height / 2 + 0.5, ground.positio
 cube.castShadow = true;
 scene.add(cube);
 
-// Create light source
+// === LIGHT SETUP ===
 const light = new THREE.DirectionalLight(0xffffff, 1);
 light.position.y = 3;
 light.position.z = 1;
 light.castShadow = true;
 scene.add(light);
 
-// Ambient light for softer illumination
+// === AMBIENT LIGHT ===
 scene.add(new THREE.AmbientLight(0xffffff, 0.5));
 
+// === CAMERA SETUP ===
 camera.position.set(0, 2, 4); 
 camera.lookAt(cube.position);
 
-// Movement controls (A and D keys for left and right movement)
+// === MOVEMENT CONTROLS (A AND D KEYS) ===
 const keys = {
   a: { pressed: false },
   d: { pressed: false },
@@ -171,12 +174,12 @@ window.addEventListener('keyup', (event) => {
   }
 });
 
-// Array for enemies
+// === ENEMIES ARRAY AND SPAWN RATE ===
 const enemies = [];
 let frames = 0;
 let spawnRate = 200;
 
-// Update the score
+// === SCORE UPDATE FUNCTION ===
 function updateScore() {
   enemies.forEach((enemy) => {
     if (enemy.position.z > cube.position.z) {
@@ -188,46 +191,54 @@ function updateScore() {
   });
 }
 
-// Function to start the game
+// === GAME STATE FUNCTIONS ===
 function startGame() {
   gameOver = false;
   frames = 0;
   spawnRate = 200;
 
-  //Play soundtrack
   gamePlaySound.play();
 
-  //reset the score
   score = 0;
   scoreboard.textContent = `Score: ${score}`;
+
   enemies.forEach((enemy) => {
     scene.remove(enemy);
   });
   enemies.length = 0;
+
   cube.position.set(0, ground.position.y + ground.height / 2 + 0.5, ground.position.z + ground.depth / 2);
   cube.velocity = { x: 0, y: 0, z: 0 };
+
   document.getElementById('gameOverMessage').style.display = 'none';
   animate();
 }
 
-const gameOverSound = new Howl({
-  src: ['Meow.mp3']
-});
-const gamePlaySound = new Howl({
-  src: ['8bitVersion.mp3']
-});
+// === SOUNDS SETUP ===
+const gameOverSound = new Howl({ src: ['Meow.mp3'] });
+const gamePlaySound = new Howl({ src: ['8bitVersion.mp3'] });
 
-// Game over logic
+// === GAME OVER LOGIC ===
 let gameOver = false;
-let restartButton = document.getElementById('restartButton');
+
+// === BUTTON LOGIC ===
+const restartButton = document.getElementById('restartButton');
 restartButton.addEventListener('click', () => {
   gameOverSound.stop();
   startGame();
 });
 
-// Animation loop
+const startButton = document.getElementById('startButton');
+startButton.addEventListener('click', () => {
+  startButton.style.display = 'none';
+  startGame();
+});
+// === ANIMATION LOOP ===
 function animate() {
-  if (gameOver) return;
+  if (gameOver) {
+    startButton.style.display = 'block';
+    return;
+  }
   const animationId = requestAnimationFrame(animate);
   renderer.render(scene, camera);
 
@@ -241,11 +252,11 @@ function animate() {
   if (cube.position.y < -10) {
     console.log('Game Over');
     gameOver = true;
-    gamePlaySound.stop(); //Stop Gameplay music
-    gameOverSound.play(); //Play game-over music
-    document.getElementById('gameOverMessage').style.display = 'block'; // Show restart button
-    cancelAnimationFrame(animationId); // Stop the animation
-    return; // Stop further execution
+    gamePlaySound.stop();
+    gameOverSound.play();
+    document.getElementById('gameOverMessage').style.display = 'block';
+    cancelAnimationFrame(animationId);
+    return;
   }
 
   enemies.forEach((enemy) => {
@@ -253,11 +264,11 @@ function animate() {
     if (boxCollision({ box1: cube, box2: enemy })) {
       console.log('Game Over: Collision with enemy');
       gameOver = true;
-      gamePlaySound.stop(); //Stop Gameplay music
-      gameOverSound.play(); //Play game-over music
-      document.getElementById('gameOverMessage').style.display = 'block'; // Show restart button
-      cancelAnimationFrame(animationId); // Stop the animation
-      return; // Stop further execution
+      gamePlaySound.stop();
+      gameOverSound.play();
+      document.getElementById('gameOverMessage').style.display = 'block';
+      cancelAnimationFrame(animationId);
+      return;
     }
   });
 
@@ -265,10 +276,10 @@ function animate() {
 
   if (frames % spawnRate === 0) {
     if (spawnRate > 20) spawnRate -= 20;
-    const enemy = new Box({ //enemy change size
+    const enemy = new Box({
       width: 0.5,
       height: 2.1,
-      depth: 0.10,
+      depth: 0.1,
       position: {
         x: (Math.random() - 0.5) * 10,
         y: 0,
@@ -293,5 +304,3 @@ function animate() {
 
   frames++;
 }
-
-startGame();
