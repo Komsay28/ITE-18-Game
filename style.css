@@ -1,38 +1,50 @@
-html,
-body {
-  margin: 0;
-  background: black;
-  height: 100%;
-  overflow: hidden;
-}
 
-#scoreboard {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  font-size: 5%;
-  color: white;
-  z-index: 100;
-}
+    html, body {
+      margin: 0;
+      background: black;
+      height: 100%;
+      overflow: hidden;
+    }
 
-#gameOverMessage {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: none;
-  text-align: center;
-}
+    #scoreboard {
+      position: absolute;
+      top: 15px;
+      left: 43%;
+      font-size: 50px;
+      color: white;
+      z-index: 100;
+      font-family: sans-serif;
+    }
 
-#gameOverMessage button {
-  background-color: #0369a1;
-  color: black;
-  font-size: 18px;
-  padding: 10px 20px;
-  border: none;
-  cursor: pointer;
-}
-
-#gameOverMessage button:hover {
-  background-color: #0284c7;
-}
+    #gameOverMessage {
+      position: absolute;
+      font-family: sans-serif;
+      color: white;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: none;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.6);
+      width: 100%;
+      height: auto;
+    }
+    #gameOverMessage button {
+      background-color: #0369a1;
+      color: white;
+      font-size: 25px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+    #gameOverMessage button:hover {
+      background-color: #0284c7;
+    }
+    #startMessage button{
+      background-color: #0369a1;
+      font-family: sans-serif;
+    }
+    #startMessage button:hover{
+      background-color: #0284c7;
+    }
