@@ -1,10 +1,11 @@
 // === IMPORTS ===
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { Howl } from 'howler';
 
 // === SCENE, CAMERA, RENDERER, AND CONTROLS SETUP ===
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
 const renderer = new THREE.WebGLRenderer({
   alpha: true,
@@ -23,6 +24,8 @@ const glassTexture = textureLoader.load('glass.avif');
 // === SCOREBOARD SETUP ===
 const scoreboard = document.getElementById('scoreboard');
 let score = 0;
+
+
 
 // === BOX CLASS ===
 // Used for creating cubes, enemies, and the ground
@@ -56,8 +59,8 @@ class Box extends THREE.Mesh {
 
     // Velocity and gravity initialization
     this.velocity = velocity;
-    this.gravity = -0.002;
-    this.zAcceleration = zAcceleration;
+    this.gravity = -0.002;  // Gravity value
+    this.zAcceleration = zAcceleration;  // If true, enables acceleration in the Z-axis
   }
 
   // Update the bounding sides of the box
@@ -73,19 +76,36 @@ class Box extends THREE.Mesh {
   // Update box movement and gravity effect
   update(ground) {
     this.updateSides();
-    if (this.zAcceleration) this.velocity.z += 0.0003;
+
+    // Apply z-axis acceleration if enabled
+    if (this.zAcceleration) {
+      this.velocity.z += 0.004; // You can change this value to control the acceleration
+    }
+
+    // Apply velocity to position
     this.position.x += this.velocity.x;
     this.position.z += this.velocity.z;
-    this.applyGravity(ground);
+
+    // Apply gravity only for enemies or other objects that need it
+    if (this !== cube) { // Skip gravity for the player cube
+      this.applyGravity(ground);
+    }
+
+    // Apply gravity for the player cube only when it's not colliding with the ground
+    if (this === cube && !boxCollision({ box1: this, box2: ground })) {
+      this.velocity.y += this.gravity;
+      this.position.y += this.velocity.y;
+    }
   }
 
   // Apply gravity and collision check with the ground
   applyGravity(ground) {
     this.velocity.y += this.gravity;
-    if (boxCollision({ box1: this, box2: ground })) {
+    if (boxCollision({ box1: this, box2: ground }) && this.velocity.y < 0) {
       const friction = 0.5;
       this.velocity.y *= friction;
       this.velocity.y = -this.velocity.y; // Bounce effect
+      this.position.y = ground.position.y + ground.height / 2 + this.height / 2; // Prevent falling below the ground
     } else {
       this.position.y += this.velocity.y;
     }
@@ -113,7 +133,7 @@ const ground = new Box({
     y: -2,
     z: 0,
   },
-}); 
+});
 ground.receiveShadow = true;
 scene.add(ground);
 
@@ -150,6 +170,8 @@ camera.lookAt(cube.position);
 const keys = {
   a: { pressed: false },
   d: { pressed: false },
+  arrowRight: { pressed: false },
+  arrowLeft: { pressed: false },  
 };
 
 window.addEventListener('keydown', (event) => {
@@ -159,6 +181,12 @@ window.addEventListener('keydown', (event) => {
       break;
     case 'KeyD':
       keys.d.pressed = true;
+      break;
+    case 'ArrowRight':
+      keys.arrowRight.pressed = true;
+      break;
+    case 'ArrowLeft':
+      keys.arrowLeft.pressed = true;
       break;
   }
 });
@@ -170,6 +198,12 @@ window.addEventListener('keyup', (event) => {
       break;
     case 'KeyD':
       keys.d.pressed = false;
+      break;
+    case 'ArrowRight':
+      keys.arrowRight.pressed = false;
+      break;
+    case 'ArrowLeft':
+      keys.arrowLeft.pressed = false;
       break;
   }
 });
@@ -197,6 +231,7 @@ function startGame() {
   frames = 0;
   spawnRate = 200;
 
+  // Start the music when the game begins
   gamePlaySound.play();
 
   score = 0;
@@ -216,7 +251,7 @@ function startGame() {
 
 // === SOUNDS SETUP ===
 const gameOverSound = new Howl({ src: ['Meow.mp3'] });
-const gamePlaySound = new Howl({ src: ['8bitVersion.mp3'] });
+const gamePlaySound = new Howl({ src: ['8bitVersion.mp3'], loop: true });
 
 // === GAME OVER LOGIC ===
 let gameOver = false;
@@ -236,6 +271,20 @@ startButton.addEventListener('click', () => {
   
   startGame();
 });
+
+// === COLLISION CHECK FOR GAME OVER ===
+function checkGameOver() {
+  if (cube.position.y < -10 || enemies.some((enemy) => boxCollision({ box1: cube, box2: enemy}))) {
+    console.log('Game Over');
+    gameOver = true;
+    gamePlaySound.stop();  // Stop music when the game is over
+    gameOverSound.play();
+    document.getElementById('gameOverMessage').style.display = 'block';
+    return true;
+  }
+  return false;
+}
+
 // === ANIMATION LOOP ===
 function animate() {
   if (gameOver) {
@@ -247,23 +296,18 @@ function animate() {
 
   cube.velocity.x = 0;
 
-  if (keys.a.pressed) cube.velocity.x = -0.05;
-  else if (keys.d.pressed) cube.velocity.x = 0.05;
+  if (keys.a.pressed || keys.arrowLeft.pressed) cube.velocity.x = -0.05;
+  else if (keys.d.pressed || keys.arrowRight.pressed) cube.velocity.x = 0.05;
 
   cube.update(ground);
 
-  if (cube.position.y < -10) {
-    console.log('Game Over');
-    gameOver = true;
-    gamePlaySound.stop();
-    gameOverSound.play();
-    document.getElementById('gameOverMessage').style.display = 'block';
+  if (checkGameOver()) {
     cancelAnimationFrame(animationId);
     return;
   }
 
   enemies.forEach((enemy) => {
-    enemy.update(ground);
+    enemy.update(ground, score);
     if (boxCollision({ box1: cube, box2: enemy })) {
       console.log('Game Over: Collision with enemy');
       gameOver = true;
