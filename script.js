@@ -107,7 +107,7 @@ const ground = new Box({
   width: 10,
   height: 0.05,
   depth: 100,
-  color: '#0369a1', // Ground color
+  color: '#38CFFF', // Ground color
   position: {
     x: 0,
     y: -2,
@@ -229,8 +229,11 @@ restartButton.addEventListener('click', () => {
 });
 
 const startButton = document.getElementById('startButton');
+const startImage = document.getElementById('startImage');
 startButton.addEventListener('click', () => {
   startButton.style.display = 'none';
+  startImage.style.display = 'none';
+  
   startGame();
 });
 // === ANIMATION LOOP ===

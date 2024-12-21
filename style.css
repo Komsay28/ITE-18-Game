@@ -1,9 +1,11 @@
 
     html, body {
       margin: 0;
-      background: black;
+      background-image: url('TestBackground.png');
+      background-size: cover;
       height: 100%;
       overflow: hidden;
+      box-sizing: border-box;
     }
 
     #scoreboard {
@@ -37,14 +39,35 @@
       border: none;
       border-radius: 20px;
       cursor: pointer;
+      margin-bottom: 30px;
     }
     #gameOverMessage button:hover {
       background-color: #0284c7;
     }
+
+    #startMessage{
+      width: 50%;
+      align-self: center;
+      margin-top: 20px;
+    }
     #startMessage button{
       background-color: #0369a1;
       font-family: sans-serif;
+      color: white;
+      font-size: 25px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      margin: none;
+      
     }
     #startMessage button:hover{
       background-color: #0284c7;
+      transform: scale(1.2); /* Scale up to 120% */
+    }
+    #startImage{
+      
+      align-self: center;
+      margin: 0px;
     }
