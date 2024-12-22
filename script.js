@@ -322,7 +322,7 @@ function animate() {
   updateScore();
 
   if (frames % spawnRate === 0) {
-    if (spawnRate > 20) spawnRate -= 20;
+    if (spawnRate > 10) spawnRate -= 10;
     const enemy = new Box({
       width: 0.5,
       height: 2.1,
