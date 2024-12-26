@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "script.js",
   "scripts": {
-    "build": "vite build"
+    "build": "vite build",
+    "deploy":"vercel--prod"
   },
   "keywords": [],
   "author": "",
