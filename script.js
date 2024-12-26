@@ -31,10 +31,10 @@ const glassTexture = textureLoader.load('glass.avif');
 // === SCOREBOARD SETUP ===
 const scoreboard = document.getElementById('scoreboard');
 let score = 0;
-const scoreThreshold1 = 5;  //Red
-const scoreThreshold2 = 10; //Oraneg
-const scoreThreshold3 = 15; //Yellow
-const scoreThreshold4 = 20; //Green
+const scoreThreshold1 = 50;  //Red
+const scoreThreshold2 = 150; //Orange
+const scoreThreshold3 = 250; //Yellow
+const scoreThreshold4 = 400; //Green
 
 
 // === BOX CLASS ===
@@ -281,7 +281,7 @@ function startGame() {
 }
 
 // === SOUNDS SETUP ===
-const gameOverSound = new Howl({ src: ['Meow.mp3'] });
+const gameOverSound = new Howl({ src: ['cat.mp3'] });
 const gamePlaySound = new Howl({ src: ['8bitVersion.mp3'], loop: true });
 
 // === GAME OVER LOGIC ===
@@ -328,8 +328,8 @@ function animate() {
 
   cube.velocity.x = 0;
 
-  if (keys.a.pressed || keys.arrowLeft.pressed) cube.velocity.x = -0.05;
-  else if (keys.d.pressed || keys.arrowRight.pressed) cube.velocity.x = 0.05;
+  if (keys.a.pressed || keys.arrowLeft.pressed) cube.velocity.x = -0.1;
+  else if (keys.d.pressed || keys.arrowRight.pressed) cube.velocity.x = 0.1;
 
   cube.update(ground);
 
