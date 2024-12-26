@@ -26,7 +26,7 @@ scene.add( directionalLight );
 
 // === TEXTURE LOADER ===
 const textureLoader = new THREE.TextureLoader();
-const glassTexture = textureLoader.load('glass.avif');
+const glassTexture = textureLoader.load('./texture/glass.avif');
 
 // === SCOREBOARD SETUP ===
 const scoreboard = document.getElementById('scoreboard');
@@ -281,8 +281,8 @@ function startGame() {
 }
 
 // === SOUNDS SETUP ===
-const gameOverSound = new Howl({ src: ['cat.mp3'] });
-const gamePlaySound = new Howl({ src: ['8bitVersion.mp3'], loop: true });
+const gameOverSound = new Howl({ src: ['./texture/cat.mp3'] });
+const gamePlaySound = new Howl({ src: ['./texture/8bitVersion.mp3'], loop: true });
 
 // === GAME OVER LOGIC ===
 let gameOver = false;
