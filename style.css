@@ -1,6 +1,6 @@
     html, body {
       margin: 0;
-      background-image: url('/texture/TestBackground.png');
+      background-image: url('TestBackground.png');
       background-size: cover;
       height: 100%;
       overflow: hidden;
