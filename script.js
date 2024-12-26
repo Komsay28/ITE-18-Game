@@ -17,6 +17,13 @@ document.body.appendChild(renderer.domElement);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 
+//Lighting
+const moonlight = new THREE.AmbientLight( 0x5F82FF, 0.2 ); // soft blue light
+scene.add( moonlight );
+
+const directionalLight = new THREE.DirectionalLight( 0xaaaaaa, 3.0 ); //Gray light
+scene.add( directionalLight );
+
 // === TEXTURE LOADER ===
 const textureLoader = new THREE.TextureLoader();
 const glassTexture = textureLoader.load('glass.avif');
@@ -24,7 +31,10 @@ const glassTexture = textureLoader.load('glass.avif');
 // === SCOREBOARD SETUP ===
 const scoreboard = document.getElementById('scoreboard');
 let score = 0;
-
+const scoreThreshold1 = 5;  //Red
+const scoreThreshold2 = 10; //Oraneg
+const scoreThreshold3 = 15; //Yellow
+const scoreThreshold4 = 20; //Green
 
 
 // === BOX CLASS ===
@@ -76,7 +86,24 @@ class Box extends THREE.Mesh {
   // Update box movement and gravity effect
   update(ground) {
     this.updateSides();
-
+    
+    if(score >= scoreThreshold1 && score < scoreThreshold2){
+      directionalLight.color.set(currentColor); //Change to red
+    }
+    else if(score >= scoreThreshold2 && score < scoreThreshold3){
+      directionalLight.color.set(0xFF8A00); //Change to orange
+    }
+    else if(score >= scoreThreshold3 && score < scoreThreshold4){
+      directionalLight.color.set(0xffff00); //Change to yellow
+    }
+    else if(score >= scoreThreshold4){
+      directionalLight.color.set(0x37FF2C); //Change to green
+    }
+    else {
+      directionalLight.color.set(0xaaaaaa); // Revert to initial color
+    }
+    
+   
     // Apply z-axis acceleration if enabled
     if (this.zAcceleration) {
       this.velocity.z += 0.004; // You can change this value to control the acceleration
@@ -121,13 +148,17 @@ function boxCollision({ box1, box2 }) {
 
   return xCollision && yCollision && zCollision;
 }
-
+//Colors
+let groundColor = new THREE.Color(0x38CFFF); // OG ground color
+let currentColor = new THREE.Color(0xff0000); // color change
 // === GROUND CREATION ===
 const ground = new Box({
   width: 10,
   height: 0.05,
   depth: 100,
-  color: '#38CFFF', // Ground color
+  color: groundColor, // Ground color
+  transparent: true,
+  opacity: 0.5,
   position: {
     x: 0,
     y: -2,
@@ -261,6 +292,7 @@ const restartButton = document.getElementById('restartButton');
 restartButton.addEventListener('click', () => {
   gameOverSound.stop();
   startGame();
+  gamePlaySound.play();
 });
 
 const startButton = document.getElementById('startButton');
@@ -320,6 +352,7 @@ function animate() {
   });
 
   updateScore();
+  
 
   if (frames % spawnRate === 0) {
     if (spawnRate > 10) spawnRate -= 10;
