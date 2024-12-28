@@ -106,7 +106,7 @@ class Box extends THREE.Mesh {
    
     // Apply z-axis acceleration if enabled
     if (this.zAcceleration) {
-      this.velocity.z += 0.004; // You can change this value to control the acceleration
+      this.velocity.z += 0.003; // You can change this value to control the acceleration
     }
 
     // Apply velocity to position
